@@ -27,7 +27,7 @@
     <meta name="theme-color" content="#2563eb">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="الميزانية الذكية">
 
     <!-- الأيقونات والمكتبات الأساسية -->
@@ -88,7 +88,6 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* شاشة القفل والأمان */
         #app-gatekeeper-overlay {
             position: fixed;
             top: 0;
@@ -154,7 +153,6 @@
             border-color: var(--primary-color);
         }
 
-        /* خلفية القائمة المنسدلة في الجوال */
         .sidebar-backdrop {
             display: none;
             position: fixed;
@@ -199,7 +197,6 @@
             display: none !important;
         }
 
-        /* زر السهم الدائري البارز */
         .toggle-sidebar-btn {
             position: absolute;
             left: -18px;
@@ -900,10 +897,8 @@
         </div>
     </div>
 
-    <!-- طبقة القناع لإغلاق القائمة عند لمس الشاشة في الجوال -->
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileMenu()"></div>
 
-    <!-- شريط الرأس العلوي للجوال -->
     <div class="mobile-top-header">
         <button class="mobile-header-btn" onclick="toggleMobileMenu()" title="القائمة الرئيسية">
             <i class="fas fa-bars"></i>
@@ -919,9 +914,7 @@
         </div>
     </div>
 
-    <!-- القائمة الجانبية -->
     <div class="sidebar" id="main-sidebar">
-        <!-- زر السهم الدائري البارز -->
         <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="طي / توسيع القائمة">
             <i class="fas fa-chevron-right" id="sidebar-icon"></i>
         </button>
@@ -955,12 +948,10 @@
         <div class="main-content">
             <div id="toast-container"></div>
 
-            <!-- زر المستشار المالي العائم -->
             <button class="floating-chat-btn" onclick="toggleAdvisorChat()" title="المستشار المالي">
                 <i class="fas fa-robot"></i>
             </button>
 
-            <!-- نافذة الشات العائمة -->
             <div id="advisor-chat-window" class="chat-window">
                 <div class="chat-header">
                     <span style="font-weight: bold;"><i class="fas fa-user-tie"></i> المستشار الذكي</span>
@@ -988,7 +979,6 @@
                     </div>
                 </div>
 
-                <!-- كروت الميزانية الشهرية واليومية -->
                 <div class="dashboard-grid">
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -1288,9 +1278,12 @@
                     </div>
 
                     <div class="card">
-                        <h3 style="margin:0 0 10px 0; font-size:1.05em;"><i class="fas fa-robot text-primary"></i> الذكاء الاصطناعي</h3>
+                        <h3 style="margin:0 0 10px 0; font-size:1.05em;"><i class="fas fa-robot text-primary"></i> الذكاء الاصطناعي وقراءة الفواتير</h3>
+                        <p style="color:var(--text-muted); font-size:0.82em; margin-bottom:10px;">
+                            ضع مفتاح Google Gemini API ليقوم الذكاء الاصطناعي برؤية صورة الفاتورة وقراءة المتجر والمبلغ الإجمالي بدقة متناهية وبدون أخطاء.
+                        </p>
                         <div class="form-group">
-                            <label>مفتاح Gemini API (اختياري)</label>
+                            <label>مفتاح Gemini API</label>
                             <input type="password" id="settings-gemini-key" placeholder="AIzaSy...">
                         </div>
                         <button class="primary-btn" onclick="saveAISettings()"><i class="fas fa-save"></i> حفظ المفتاح</button>
@@ -1307,7 +1300,6 @@
             </div>
         </div>
 
-        <!-- شريط التنقل السفلي للجوال -->
         <div class="bottom-nav">
             <button class="bottom-nav-item active" onclick="switchPage('dashboard', this); updateBottomNav(this);">
                 <i class="fas fa-home"></i>
@@ -1332,10 +1324,10 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة مصروف جديد -->
+    <!-- نافذة إضافة وتعديل المصروف -->
     <div id="expenseModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.2em;">إضافة مصروف جديد</h3>
+            <h3 id="expense-modal-title" style="margin-top: 0; margin-bottom: 16px; font-size: 1.2em;">إضافة مصروف جديد</h3>
             
             <div class="form-group">
                 <label>المبلغ (ريال)</label>
@@ -1388,8 +1380,8 @@
                     <button type="button" class="action-btn" style="margin: 0 auto;" onclick="document.getElementById('receipt-file-input').click()"><i class="fas fa-camera"></i> صورة أو التقاط فاتورة</button>
                 </div>
 
-                <button type="button" id="btn-process-ai" class="primary-btn" style="display:none; width:100%; justify-content:center; margin-top:8px;" onclick="processReceiptAI()"><i class="fas fa-magic"></i> استخراج بيانات الفاتورة</button>
-                <div id="ai-loading-indicator" style="display:none; font-size:0.82em; color:var(--primary-color); margin-top:6px;"><i class="fas fa-spinner fa-spin"></i> جاري فحص الفاتورة...</div>
+                <button type="button" id="btn-process-ai" class="primary-btn" style="display:none; width:100%; justify-content:center; margin-top:8px;" onclick="processReceiptAI()"><i class="fas fa-magic"></i> استخراج بيانات الفاتورة بالذكاء الاصطناعي</button>
+                <div id="ai-loading-indicator" style="display:none; font-size:0.82em; color:var(--primary-color); margin-top:6px;"><i class="fas fa-spinner fa-spin"></i> جاري فحص الفاتورة بدقة...</div>
             </div>
 
             <div class="modal-actions">
@@ -1507,12 +1499,15 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل المصروف -->
+    <!-- نافذة تفاصيل المصروف مع زر التعديل وزر الحذف في الترويسة -->
     <div id="expenseDetailsModal" class="modal">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:12px;">
                 <h3 style="margin:0; font-size:1.1em;"><i class="fas fa-receipt text-primary"></i> تفاصيل المصروف</h3>
-                <button class="btn-edit-badge" style="color:var(--danger); border-color:var(--danger);" onclick="deleteCurrentExpense()"><i class="fas fa-trash"></i> حذف</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-edit-badge" onclick="editCurrentExpense()"><i class="fas fa-pen"></i> تعديل</button>
+                    <button class="btn-edit-badge" style="color:var(--danger); border-color:var(--danger);" onclick="deleteCurrentExpense()"><i class="fas fa-trash"></i> حذف</button>
+                </div>
             </div>
 
             <div id="expense-printable-receipt" style="background:var(--surface-card); border-radius:10px; padding:14px; border:1px solid var(--border-color); margin-bottom:12px;">
@@ -1625,6 +1620,7 @@
 
         let activeCategoryDetailId = null;
         let activeExpenseDetailId = null;
+        let editingExpenseId = null; // للمتابعة عند تعديل المصروف
         let editingFundType = null;
         let pendingBudgetEditType = null;
         let pieChartInstance = null;
@@ -1853,7 +1849,6 @@
             }
         }
 
-        /* دالة الربط السحابي الموحد (Shared Sync) */
         async function initCloudConnection() {
             let configObj = null;
             if (typeof __firebase_config !== 'undefined') {
@@ -1876,7 +1871,6 @@
                 firebaseApp = initializeApp(configObj);
                 firestoreDb = getFirestore(firebaseApp);
 
-                // الغرفة الموحدة الثابتة لجميع الأجهزة (الجوال والكمبيوتر)
                 const docRef = doc(firestoreDb, 'shared_budgets', 'primary_budget_state');
 
                 onSnapshot(docRef, (docSnap) => {
@@ -1931,7 +1925,6 @@
 
             try {
                 const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                // حفظ البيانات في نفس المسار الموحد
                 const docRef = doc(firestoreDb, 'shared_budgets', 'primary_budget_state');
 
                 const cleanState = {
@@ -2262,7 +2255,7 @@
                     row.innerHTML = `
                         <span class="text-danger" style="font-weight:bold;">- ${parseFloat(exp.amount).toLocaleString()} ${APP_STATE.currency}</span>
                         <div>
-                            <span>${exp.receiptImg ? '<i class="fas fa-paperclip text-primary" style="margin-left:4px;"></i>' : ''}${exp.store}</span>
+                            <span>${exp.receiptImg ? '<i class="fas fa-paperclip text-primary"></i> ' : ''}${exp.store}</span>
                             <span style="font-size:0.75em; color:var(--text-muted); margin-right:6px;">${exp.date.split('T')[0]}</span>
                         </div>
                     `;
@@ -2345,6 +2338,43 @@
             openModal('expenseDetailsModal');
         }
 
+        /* دالة فتح نافذة التعديل على المصروف المعتمد */
+        function editCurrentExpense() {
+            if (!activeExpenseDetailId) return;
+            const exp = APP_STATE.expenses.find(e => e.id === activeExpenseDetailId);
+            if (!exp) return;
+
+            editingExpenseId = exp.id; // تحديد المعرف لوضع التعديل
+            closeModal('expenseDetailsModal');
+
+            document.getElementById('expense-modal-title').innerText = 'تعديل المصروف';
+            document.getElementById('exp-amount').value = exp.amount;
+            document.getElementById('exp-store').value = exp.store;
+            document.getElementById('exp-method').value = exp.method;
+            document.getElementById('exp-bank').value = exp.bank || '';
+            document.getElementById('exp-beneficiary').value = exp.beneficiary || '';
+            document.getElementById('exp-category').value = exp.category;
+            
+            // ضبط التاريخ
+            if (exp.date) {
+                document.getElementById('exp-date').value = exp.date.slice(0, 16);
+            }
+
+            togglePaymentMethodFields();
+
+            // ضبط صورة الفاتورة إن وجدت
+            if (exp.receiptImg) {
+                document.getElementById('receipt-preview-img').src = exp.receiptImg;
+                document.getElementById('receipt-preview-box').style.display = 'block';
+                document.getElementById('receipt-upload-prompt').style.display = 'none';
+                document.getElementById('btn-process-ai').style.display = 'block';
+            } else {
+                clearReceiptImage();
+            }
+
+            openModal('expenseModal');
+        }
+
         function togglePaymentMethodFields() {
             const method = document.getElementById('exp-method').value;
             const bankGroup = document.getElementById('group-exp-bank');
@@ -2366,6 +2396,8 @@
         }
 
         function openExpenseModal() {
+            editingExpenseId = null; // إضافة جديدة
+            document.getElementById('expense-modal-title').innerText = 'إضافة مصروف جديد';
             document.getElementById('exp-amount').value = '';
             document.getElementById('exp-store').value = '';
             document.getElementById('exp-method').value = 'بطاقة / شبكة';
@@ -2411,7 +2443,7 @@
                     const catNames = APP_STATE.categories.map(c => c.name).join(', ');
                     const prompt = `حلل هذا النص واستخرج بيانات المصروف: "${text}". البنود: [${catNames}]. طرق الدفع: ["بطاقة / شبكة", "كاش", "تحويل بنكي"]. أرجع النتيجة فقط بصيغة JSON نظيفة: {"amount": رقم, "store": "المتجر", "category": "البند الأنسب", "method": "طريقة الدفع", "bank": "البنك إن وجد", "beneficiary": "المستفيد إن وجد"}`;
 
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${APP_STATE.geminiApiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${APP_STATE.geminiApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -2462,15 +2494,65 @@
             showToast(`⚡ تم تسجيل: ${newExp.store} (${newExp.amount} ${APP_STATE.currency}) بنجاح!`, 'success');
         }
 
+        /* محرك استخراج وتحليل نصوص الفاتورة بدقة محاسبية ومنع الأرقام العشوائية */
         function parseExpenseLocally(text) {
             let amount = 0;
-            const numMatch = text.match(/\d+([.,]\d{1,2})?/);
-            if (numMatch) amount = parseFloat(numMatch[0].replace(',', '.'));
+            const lines = text.split('\n');
 
+            // 1. البحث عن الكلمات الدلالية للمبلغ الإجمالي
+            const totalKeywords = [
+                'المجموع الكلي', 'الإجمالي الكلي', 'المبلغ الإجمالي', 'المجموع', 'الإجمالي', 
+                'المستحق', 'صافي المبلغ', 'المبلغ المطلوب', 'total', 'net total', 'grand total', 
+                'amount due', 'total amount', 'balance due'
+            ];
+
+            // استبعاد أسطر الضريبة والسجل وأرقام الهاتف
+            const ignoreKeywords = ['الرقم الضريبي', 'سجل تجاري', 'vat', 'tax', 'هاتف', 'tel', 'phone', 'cr:'];
+
+            for (let line of lines) {
+                const lowerLine = line.toLowerCase();
+                const hasIgnore = ignoreKeywords.some(k => lowerLine.includes(k));
+                const hasTotal = totalKeywords.some(k => lowerLine.includes(k));
+
+                if (hasTotal && !hasIgnore) {
+                    const match = line.match(/(\d+[.,]\d{2}|\d+)/g);
+                    if (match) {
+                        const parsedCandidates = match.map(m => parseFloat(m.replace(',', '.'))).filter(n => n > 0 && n < 100000);
+                        if (parsedCandidates.length > 0) {
+                            amount = Math.max(...parsedCandidates); // اختيار المبلغ الإجمالي
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // في حال عدم العثور عبر الكلمات الدلالية، يتم استبعاد الأرقام الكبيرة مثل الرقم الضريبي (15 خانة)
+            if (!amount) {
+                const allNumbers = [];
+                for (let line of lines) {
+                    if (ignoreKeywords.some(k => line.toLowerCase().includes(k))) continue;
+                    const matches = line.match(/(?:^|\s)(\d{1,4}(?:[.,]\d{1,2})?)(?:\s|$|﷼|SAR|SR)/g);
+                    if (matches) {
+                        matches.forEach(m => {
+                            const val = parseFloat(m.replace(/[^\d.,]/g, '').replace(',', '.'));
+                            if (val > 0.5 && val < 10000) allNumbers.push(val);
+                        });
+                    }
+                }
+                if (allNumbers.length > 0) {
+                    amount = Math.max(...allNumbers);
+                }
+            }
+
+            // تحديد طريقة الدفع
             let method = 'بطاقة / شبكة';
-            if (text.includes('كاش') || text.includes('نقدا')) method = 'كاش';
-            else if (text.includes('تحويل') || text.includes('حولت')) method = 'تحويل بنكي';
+            if (text.includes('كاش') || text.includes('نقدا') || text.includes('نقد') || text.toLowerCase().includes('cash')) {
+                method = 'كاش';
+            } else if (text.includes('تحويل') || text.includes('حولت') || text.toLowerCase().includes('transfer')) {
+                method = 'تحويل بنكي';
+            }
 
+            // تحديد البنك
             let bank = '';
             const banks = ['الراجحي', 'الأهلي', 'الإنماء', 'الرياض', 'البلاد', 'الفرنسي', 'ساب', 'العربي'];
             banks.forEach(b => { if (text.includes(b)) bank = 'بنك ' + b; });
@@ -2479,23 +2561,30 @@
             const toMatch = text.match(/لـ?([^\s,]+)/);
             if (toMatch && method === 'تحويل بنكي') beneficiary = toMatch[1];
 
+            // تحديد البند الأنسب بدقة
             let category = APP_STATE.categories[0]?.name || 'المقاضي والمواد الغذائية';
             const lower = text.toLowerCase();
 
-            if (lower.includes('بنده') || lower.includes('مقاضي') || lower.includes('سوبرماركت') || lower.includes('بقالة') || lower.includes('خضار') || lower.includes('العثيم')) {
+            if (lower.includes('بنده') || lower.includes('مقاضي') || lower.includes('سوبرماركت') || lower.includes('بقالة') || lower.includes('العثيم') || lower.includes('لولو') || lower.includes('تموينات') || lower.includes('ماركت')) {
                 category = APP_STATE.categories.find(c => c.name.includes('المقاضي') || c.name.includes('غذائية'))?.name || category;
-            } else if (lower.includes('بنزين') || lower.includes('محطة') || lower.includes('دريس') || lower.includes('سيارة') || lower.includes('زيت')) {
+            } else if (lower.includes('بنزين') || lower.includes('محطة') || lower.includes('دريس') || lower.includes('ساسكو') || lower.includes('سيارة') || lower.includes('زيت') || lower.includes('petrol') || lower.includes('fuel')) {
                 category = APP_STATE.categories.find(c => c.name.includes('السيارة') || c.name.includes('بنزين'))?.name || category;
-            } else if (lower.includes('مطعم') || lower.includes('كافيه') || lower.includes('قهوة') || lower.includes('البيك') || lower.includes('ماك') || lower.includes('عشاء')) {
+            } else if (lower.includes('مطعم') || lower.includes('كافيه') || lower.includes('قهوة') || lower.includes('البيك') || lower.includes('ماك') || lower.includes('شاورما') || lower.includes('عشاء') || lower.includes('restaurant') || lower.includes('cafe')) {
                 category = APP_STATE.categories.find(c => c.name.includes('المطاعم') || c.name.includes('الترفيه'))?.name || category;
-            } else if (lower.includes('فاتورة') || lower.includes('كهرباء') || lower.includes('مياه') || lower.includes('نت') || lower.includes('stc')) {
+            } else if (lower.includes('فاتورة') || lower.includes('كهرباء') || lower.includes('مياه') || lower.includes('نت') || lower.includes('stc') || lower.includes('موبايلي') || lower.includes('telecom')) {
                 category = APP_STATE.categories.find(c => c.name.includes('الفواتير') || c.name.includes('الالتزامات'))?.name || category;
             }
 
-            let store = text.replace(numMatch ? numMatch[0] : '', '')
-                .replace(/ريال|سجل|مصروف|شراء|دفعت|حولت|عن طريق|شبكة|كاش|تحويل/g, '')
-                .trim();
-            if (!store || store.length < 2) store = 'عملية سريعة';
+            // استخراج اسم المتجر من السطور الأولى النظيفة
+            let store = '';
+            for (let l of lines) {
+                let clean = l.replace(/فاتورة|ضريبية|مبسطة|شركة|مؤسسة|فرع|tax|invoice|pos/gi, '').trim();
+                if (clean.length >= 3 && clean.length <= 35 && isNaN(clean) && !clean.includes('15%')) {
+                    store = clean;
+                    break;
+                }
+            }
+            if (!store) store = 'مشتريات فاتورة';
 
             return { amount, store, category, method, bank, beneficiary };
         }
@@ -2519,27 +2608,47 @@
                 return;
             }
 
-            const newExp = {
-                id: 'exp-' + Date.now(),
-                amount: amount,
-                store: store,
-                method: method,
-                bank: bank,
-                beneficiary: beneficiary,
-                category: category,
-                date: dateVal || new Date().toISOString(),
-                receiptImg: receiptImg && receiptImg.startsWith('data:image') ? receiptImg : null
-            };
+            if (editingExpenseId) {
+                // تعديل مصروف معتمد موجود مسبقاً
+                const expIndex = APP_STATE.expenses.findIndex(e => e.id === editingExpenseId);
+                if (expIndex !== -1) {
+                    APP_STATE.expenses[expIndex] = {
+                        ...APP_STATE.expenses[expIndex],
+                        amount: amount,
+                        store: store,
+                        method: method,
+                        bank: bank,
+                        beneficiary: beneficiary,
+                        category: category,
+                        date: dateVal || APP_STATE.expenses[expIndex].date,
+                        receiptImg: receiptImg && receiptImg.startsWith('data:image') ? receiptImg : APP_STATE.expenses[expIndex].receiptImg
+                    };
+                    showToast('تم تعديل المصروف وتحديث الحسابات بنجاح!', 'success');
+                }
+                editingExpenseId = null;
+            } else {
+                // إضافة مصروف جديد
+                const newExp = {
+                    id: 'exp-' + Date.now(),
+                    amount: amount,
+                    store: store,
+                    method: method,
+                    bank: bank,
+                    beneficiary: beneficiary,
+                    category: category,
+                    date: dateVal || new Date().toISOString(),
+                    receiptImg: receiptImg && receiptImg.startsWith('data:image') ? receiptImg : null
+                };
+                APP_STATE.expenses.unshift(newExp);
+                showToast('تم حفظ المصروف بنجاح!', 'success');
+            }
 
-            APP_STATE.expenses.unshift(newExp);
             saveLocalData();
             closeModal('expenseModal');
             renderDashboard();
             renderCategories();
             renderRecentExpenses();
             renderCalendar();
-
-            showToast('تم حفظ المصروف بنجاح!', 'success');
         }
 
         function openEditBudgetModal(type) {
@@ -3079,7 +3188,7 @@
             if (APP_STATE.geminiApiKey) {
                 try {
                     const prompt = `أنت مستشار مالي ذكي. بيانات المستخدم: المقررة: ${APP_STATE.monthlyBudget} ${APP_STATE.currency}، المنصرف: ${monthlySpent} ${APP_STATE.currency}، المتبقي: ${monthlyRemaining} ${APP_STATE.currency}، اليومي: ${APP_STATE.dailyBudget}، منصرف اليوم: ${dailySpent}. أجب باختصار وذكاء: "${userQuery}"`;
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${APP_STATE.geminiApiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${APP_STATE.geminiApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -3191,6 +3300,7 @@
             if (btnAi) btnAi.style.display = 'none';
         }
 
+        /* قراءة الفاتورة بالذكاء الاصطناعي بدقة فائقة وبدون عشوائية */
         async function processReceiptAI() {
             const previewImg = document.getElementById('receipt-preview-img');
             if (!previewImg || !previewImg.src) return;
@@ -3199,23 +3309,76 @@
             loading.style.display = 'block';
             btnAi.disabled = true;
 
-            try {
-                if (typeof Tesseract !== 'undefined') {
-                    const result = await Tesseract.recognize(previewImg.src, 'ara+eng');
-                    const text = result.data.text;
-                    const parsed = parseExpenseLocally(text);
-                    if (parsed.amount) document.getElementById('exp-amount').value = parsed.amount;
-                    if (parsed.store && parsed.store !== 'عملية سريعة') document.getElementById('exp-store').value = parsed.store;
-                    if (parsed.category) document.getElementById('exp-category').value = parsed.category;
-                    showToast('تمت قراءة بيانات الفاتورة بنجاح!', 'success');
-                } else {
-                    showToast('الفحص البصري غير متوفر', 'warning');
+            let extracted = null;
+
+            // 1. الأولوية: استخدام Google Gemini Vision المباشر لتحليل الصورة بدقة
+            if (APP_STATE.geminiApiKey) {
+                try {
+                    const base64Data = previewImg.src.split(',')[1];
+                    const mimeType = previewImg.src.split(';')[0].split(':')[1] || 'image/jpeg';
+                    const catNames = APP_STATE.categories.map(c => c.name).join(', ');
+
+                    const prompt = `أنت مدقق مالي ذكي. انظر إلى صورة الفاتورة المرفقة واستخرج منها البيانات بدقة متناهية:
+1. المبلغ الإجمالي النهائي المدفوع (ابحث عن: المجموع الكلي، Total، الإجمالي شامل الضريبة، أو المبلغ المدفوع). تجنب تماماً أخذ الرقم الضريبي أو رقم الفاتورة أو الضريبة المنفصلة.
+2. اسم المحل أو المتجر بوضوح.
+3. طريقة الدفع (إذا رأيت شبكة أو مدى أو فيزا أو بطاقة سجل "بطاقة / شبكة"، وإذا نقد سجل "كاش").
+4. اسم البند الأنسب من هذه البنود حصراً: [${catNames}].
+أرجع الإجابة فقط بصيغة JSON بدون مارك داون:
+{"amount": رقم_عشري, "store": "اسم المتجر", "category": "البند", "method": "طريقة الدفع"}`;
+
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${APP_STATE.geminiApiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: prompt },
+                                    { inline_data: { mime_type: mimeType, data: base64Data } }
+                                ]
+                            }]
+                        })
+                    });
+
+                    const resData = await res.json();
+                    let rawText = resData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    extracted = JSON.parse(rawText);
+                } catch (geminiErr) {
+                    console.warn('Gemini vision parse error, falling back to Tesseract OCR:', geminiErr);
                 }
-            } catch (err) {
-                showToast('تعذر فحص الفاتورة', 'warning');
-            } finally {
-                loading.style.display = 'none';
-                btnAi.disabled = false;
+            }
+
+            // 2. البديل المحلي: Tesseract OCR مع فلترة السطور المحاسبية
+            if (!extracted || !extracted.amount) {
+                try {
+                    if (typeof Tesseract !== 'undefined') {
+                        const result = await Tesseract.recognize(previewImg.src, 'ara+eng');
+                        const text = result.data.text;
+                        extracted = parseExpenseLocally(text);
+                    }
+                } catch (tesseractErr) {
+                    console.error('Tesseract failed:', tesseractErr);
+                }
+            }
+
+            loading.style.display = 'none';
+            btnAi.disabled = false;
+
+            if (extracted && extracted.amount > 0) {
+                document.getElementById('exp-amount').value = extracted.amount;
+                if (extracted.store && extracted.store !== 'مشتريات فاتورة') {
+                    document.getElementById('exp-store').value = extracted.store;
+                }
+                if (extracted.category) {
+                    document.getElementById('exp-category').value = extracted.category;
+                }
+                if (extracted.method) {
+                    document.getElementById('exp-method').value = extracted.method;
+                    togglePaymentMethodFields();
+                }
+                showToast(`✅ تم استخراج الإجمالي: ${extracted.amount} ${APP_STATE.currency} والمتجر: ${extracted.store}`, 'success');
+            } else {
+                showToast('تعذر استخراج المبلغ بدقة، يرجى كتابته يدوياً', 'warning');
             }
         }
 
