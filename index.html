@@ -199,7 +199,7 @@
             display: none !important;
         }
 
-        /* زر السهم الدائري البارز المعدل */
+        /* زر السهم الدائري البارز */
         .toggle-sidebar-btn {
             position: absolute;
             left: -18px;
@@ -921,7 +921,7 @@
 
     <!-- القائمة الجانبية -->
     <div class="sidebar" id="main-sidebar">
-        <!-- زر السهم الدائري البارز المعدل -->
+        <!-- زر السهم الدائري البارز -->
         <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="طي / توسيع القائمة">
             <i class="fas fa-chevron-right" id="sidebar-icon"></i>
         </button>
@@ -1361,7 +1361,7 @@
                 <input type="text" id="exp-beneficiary" placeholder="مثال: محمد، شركة الاتصالات...">
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="group-exp-store">
                 <label>اسم المحل / الوصف</label>
                 <input type="text" id="exp-store" placeholder="مثال: سوبرماركت بنده...">
             </div>
@@ -1634,8 +1634,6 @@
 
         let firebaseApp = null;
         let firestoreDb = null;
-        let firebaseAuth = null;
-        let currentUserId = null;
         let isCloudConnected = false;
         let isSyncingFromCloud = false;
 
@@ -1759,7 +1757,6 @@
             }, 3500);
         }
 
-        /* تعديل المؤشر الدائري وحركة السهم بدقة */
         function toggleSidebar() {
             const sidebar = document.getElementById('main-sidebar');
             sidebar.classList.toggle('collapsed');
@@ -1831,7 +1828,7 @@
 
             if (isCloudConnected) {
                 if (icon) icon.className = 'fas fa-cloud text-success';
-                if (text) text.innerHTML = '<span class="text-success font-bold">متصل بالسحابة</span>';
+                if (text) text.innerHTML = '<span class="text-success font-bold">متصل بالسحابة (مزامنة فورية)</span>';
                 if (badge) {
                     badge.innerText = 'متصل ونشط';
                     badge.style.background = 'rgba(16,185,129,0.15)';
@@ -1856,6 +1853,7 @@
             }
         }
 
+        /* دالة الربط السحابي الموحد (Shared Sync) */
         async function initCloudConnection() {
             let configObj = null;
             if (typeof __firebase_config !== 'undefined') {
@@ -1873,23 +1871,13 @@
 
             try {
                 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
-                const { getAuth, signInAnonymously, signInWithCustomToken } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
                 const { getFirestore, doc, setDoc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
 
                 firebaseApp = initializeApp(configObj);
                 firestoreDb = getFirestore(firebaseApp);
-                firebaseAuth = getAuth(firebaseApp);
 
-                let userCred;
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    userCred = await signInWithCustomToken(firebaseAuth, __initial_auth_token);
-                } else {
-                    userCred = await signInAnonymously(firebaseAuth);
-                }
-
-                currentUserId = userCred.user.uid;
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'budget-smart-app';
-                const docRef = doc(firestoreDb, 'artifacts', appId, 'users', currentUserId, 'budget_data', 'state');
+                // الغرفة الموحدة الثابتة لجميع الأجهزة (الجوال والكمبيوتر)
+                const docRef = doc(firestoreDb, 'shared_budgets', 'primary_budget_state');
 
                 onSnapshot(docRef, (docSnap) => {
                     if (docSnap.exists()) {
@@ -1902,6 +1890,7 @@
                             if (cloudData.budgetStartDate !== undefined) APP_STATE.budgetStartDate = cloudData.budgetStartDate;
                             if (cloudData.budgetEndDate !== undefined) APP_STATE.budgetEndDate = cloudData.budgetEndDate;
                             if (cloudData.currency !== undefined) APP_STATE.currency = cloudData.currency;
+                            if (cloudData.settingsPIN !== undefined && cloudData.settingsPIN) APP_STATE.settingsPIN = cloudData.settingsPIN;
                             if (Array.isArray(cloudData.categories) && cloudData.categories.length > 0) APP_STATE.categories = cloudData.categories;
                             if (Array.isArray(cloudData.expenses)) APP_STATE.expenses = cloudData.expenses;
                             if (cloudData.savings) APP_STATE.savings = cloudData.savings;
@@ -1917,7 +1906,7 @@
                             renderDebtsPage();
                             renderDecisionsHistory();
                             updateDateRangeDisplay();
-                            setTimeout(() => { isSyncingFromCloud = false; }, 500);
+                            setTimeout(() => { isSyncingFromCloud = false; }, 400);
                         }
                     } else {
                         saveCloudData();
@@ -1938,12 +1927,12 @@
         }
 
         async function saveCloudData() {
-            if (!isCloudConnected || !firestoreDb || !currentUserId || isSyncingFromCloud) return;
+            if (!isCloudConnected || !firestoreDb || isSyncingFromCloud) return;
 
             try {
                 const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'budget-smart-app';
-                const docRef = doc(firestoreDb, 'artifacts', appId, 'users', currentUserId, 'budget_data', 'state');
+                // حفظ البيانات في نفس المسار الموحد
+                const docRef = doc(firestoreDb, 'shared_budgets', 'primary_budget_state');
 
                 const cleanState = {
                     monthlyBudget: APP_STATE.monthlyBudget,
@@ -1952,6 +1941,7 @@
                     budgetStartDate: APP_STATE.budgetStartDate,
                     budgetEndDate: APP_STATE.budgetEndDate,
                     currency: APP_STATE.currency,
+                    settingsPIN: APP_STATE.settingsPIN || '',
                     categories: APP_STATE.categories,
                     expenses: APP_STATE.expenses,
                     savings: APP_STATE.savings,
