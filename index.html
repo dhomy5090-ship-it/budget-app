@@ -27,7 +27,7 @@
     <meta name="theme-color" content="#2563eb">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="الميزانية الذكية">
 
     <!-- الأيقونات والمكتبات الأساسية -->
@@ -1120,10 +1120,11 @@
                 </div>
             </div>
 
-            <!-- 4. التقويم المالي -->
+            <!-- 4. التقويم المالي المطور (عرض المصروف والمتبقي بدقة) -->
             <div id="page-calendar" class="page-section">
                 <div class="header">
                     <h2>التقويم المالي 📅</h2>
+                    <span style="font-size:0.85em; color:var(--text-muted);">تتبع يومي دقيق للمنصرف والمتبقي من المخصص</span>
                 </div>
                 <div class="card" id="calendar-widget-container">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1133,67 +1134,96 @@
                             <button class="action-btn" onclick="changeCalendarMonth(1)"><i class="fas fa-chevron-left"></i></button>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 8px; color: var(--text-muted); font-size:0.8em;">
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 8px; color: var(--text-muted); font-size:0.82em;">
                         <div>أحد</div><div>إثنين</div><div>ثلاثاء</div><div>أربعاء</div><div>خميس</div><div>جمعة</div><div>سبت</div>
                     </div>
-                    <div id="calendar-days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
+                    <div id="calendar-days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;"></div>
                 </div>
             </div>
 
-            <!-- 5. الادخار والترحيل الذكي -->
+            <!-- 5. الادخار والترحيل الذكي المطور -->
             <div id="page-savings" class="page-section">
                 <div class="header">
                     <h2>الادخار والترحيل الذكي 🔄</h2>
+                    <button class="primary-btn" style="padding: 7px 14px; font-size: 0.82em;" onclick="openQuickDepositModal()"><i class="fas fa-plus"></i> إيداع مباشر بالصناديق</button>
                 </div>
                 
                 <div class="dashboard-grid">
+                    <!-- كرت ترحيل الفائض اليومي مع خيار اختيار اليوم -->
                     <div class="card" style="border: 2px dashed var(--secondary-color); background: rgba(239, 68, 68, 0.04);">
-                        <h3 style="margin:0; font-size:1.05em;"><i class="fas fa-calendar-day text-secondary"></i> ترحيل الفائض اليومي</h3>
-                        <div class="stat-row" style="margin-top:10px;"><span>متبقي اليوم:</span><span class="stat-value text-success" id="savings-daily-remaining">0 ﷼</span></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="margin:0; font-size:1.05em;"><i class="fas fa-calendar-day text-secondary"></i> ترحيل الفائض اليومي</h3>
+                            <span class="badge" style="background:rgba(239,68,68,0.15); color:var(--secondary-color); padding:3px 8px; border-radius:6px; font-size:0.75em; font-weight:bold;">يومي</span>
+                        </div>
+                        
                         <div class="form-group" style="margin-top:10px;">
+                            <label>اختر اليوم للتحقق من فائضه:</label>
+                            <input type="date" id="daily-rollover-date" onchange="updateSelectedDayRolloverDisplay()">
+                        </div>
+
+                        <div class="stat-row">
+                            <span id="label-selected-day-rollover">فائض اليوم المختار:</span>
+                            <span class="stat-value text-success" id="savings-daily-remaining">0 ﷼</span>
+                        </div>
+
+                        <div class="form-group" style="margin-top:8px;">
                             <label>وجهة الترحيل:</label>
                             <select id="daily-rollover-target">
                                 <option value="emergency">صندوق الطوارئ</option>
                                 <option value="investment">صندوق الاستثمار والتوفير</option>
                             </select>
                         </div>
-                        <button class="primary-btn" style="width:100%; justify-content:center;" onclick="executeDailyRollover()"><i class="fas fa-arrow-down"></i> ترحيل اليومي الآن</button>
+                        <button class="primary-btn" style="width:100%; justify-content:center;" onclick="executeDailyRollover()"><i class="fas fa-arrow-down"></i> ترحيل فائض هذا اليوم</button>
                     </div>
 
+                    <!-- كرت ترحيل الفائض الشهري -->
                     <div class="card" style="border: 2px dashed var(--primary-color); background: rgba(37, 99, 235, 0.04);">
-                        <h3 style="margin:0; font-size:1.05em;"><i class="fas fa-calendar-alt text-primary"></i> ترحيل الفائض الشهري</h3>
-                        <div class="stat-row" style="margin-top:10px;"><span>الفائض الكلي:</span><span class="stat-value text-success" id="savings-monthly-remaining">0 ﷼</span></div>
-                        <div class="form-group" style="margin-top:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="margin:0; font-size:1.05em;"><i class="fas fa-calendar-alt text-primary"></i> ترحيل الفائض الشهري</h3>
+                            <span class="badge" style="background:rgba(37,99,235,0.15); color:var(--primary-color); padding:3px 8px; border-radius:6px; font-size:0.75em; font-weight:bold;">شهري</span>
+                        </div>
+                        <p style="color:var(--text-muted); font-size:0.82em; margin: 10px 0;">تحويل الفائض المتبقي من كامل الميزانية الشهرية.</p>
+                        <div class="stat-row"><span>الفائض الكلي للشهر:</span><span class="stat-value text-success" id="savings-monthly-remaining">0 ﷼</span></div>
+                        <div class="form-group" style="margin-top:8px;">
                             <label>وجهة الترحيل:</label>
                             <select id="monthly-rollover-target">
                                 <option value="emergency">صندوق الطوارئ</option>
                                 <option value="investment">صندوق الاستثمار والتوفير</option>
                             </select>
                         </div>
-                        <button class="primary-btn" style="width:100%; justify-content:center;" onclick="executeMonthlyRollover()"><i class="fas fa-arrow-down"></i> ترحيل الشهري الآن</button>
+                        <button class="primary-btn" style="width:100%; justify-content:center;" onclick="executeMonthlyRollover()"><i class="fas fa-arrow-down"></i> ترحيل الفائض الشهري الآن</button>
                     </div>
                 </div>
 
+                <!-- أرصدة الصناديق مع أزرار الإيداع والتعديل -->
                 <div class="dashboard-grid">
                     <div class="card">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h3 style="margin:0; font-size:1.05em;"><i class="fas fa-shield-alt text-warning"></i> صندوق الطوارئ</h3>
-                            <button class="btn-edit-badge" onclick="openFundEditModal('emergency')"><i class="fas fa-pen"></i> تعديل</button>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn-edit-badge" onclick="openDepositFundModal('emergency')"><i class="fas fa-plus"></i> إيداع</button>
+                                <button class="btn-edit-badge" onclick="openFundEditModal('emergency')"><i class="fas fa-pen"></i> تعديل</button>
+                            </div>
                         </div>
                         <div style="font-size: 1.8em; font-weight: 800; color: var(--warning); margin: 12px 0;" id="emergency-fund-balance">0 ﷼</div>
+                        <div style="font-size:0.8em; color:var(--text-muted);">مخصص لمواجهة الأزمات والمصروفات الطارئة</div>
                     </div>
 
                     <div class="card">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h3 style="margin:0; font-size:1.05em;"><i class="fas fa-chart-line text-success"></i> صندوق الاستثمار</h3>
-                            <button class="btn-edit-badge" onclick="openFundEditModal('investment')"><i class="fas fa-pen"></i> تعديل</button>
+                            <div style="display:flex; gap:6px;">
+                                <button class="btn-edit-badge" onclick="openDepositFundModal('investment')"><i class="fas fa-plus"></i> إيداع</button>
+                                <button class="btn-edit-badge" onclick="openFundEditModal('investment')"><i class="fas fa-pen"></i> تعديل</button>
+                            </div>
                         </div>
                         <div style="font-size: 1.8em; font-weight: 800; color: var(--success); margin: 12px 0;" id="investment-fund-balance">0 ﷼</div>
+                        <div style="font-size:0.8em; color:var(--text-muted);">مخصص لتنمية رأس المال والأهداف المستقبلية</div>
                     </div>
                 </div>
 
                 <div class="card" style="margin-top:15px;">
-                    <h3 style="margin:0 0 10px 0; font-size:1.05em;"><i class="fas fa-history text-primary"></i> سجل الترحيل</h3>
+                    <h3 style="margin:0 0 10px 0; font-size:1.05em;"><i class="fas fa-history text-primary"></i> سجل الترحيل والإيداع</h3>
                     <div id="rollover-history-container" style="display:flex; flex-direction:column; gap:8px;"></div>
                 </div>
             </div>
@@ -1412,6 +1442,32 @@
         </div>
     </div>
 
+    <!-- نافذة الإيداع المباشر في الصناديق -->
+    <div id="quickDepositModal" class="modal">
+        <div class="modal-content">
+            <h3 id="deposit-modal-title" style="margin-top:0;"><i class="fas fa-hand-holding-usd text-success"></i> إيداع مباشر بالصناديق</h3>
+            <div class="form-group">
+                <label>اختر الصندوق</label>
+                <select id="deposit-fund-target">
+                    <option value="emergency">صندوق الطوارئ</option>
+                    <option value="investment">صندوق الاستثمار والتوفير</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>المبلغ المراد إيداعه (﷼)</label>
+                <input type="number" step="0.01" id="deposit-fund-amount" placeholder="أدخل المبلغ...">
+            </div>
+            <div class="form-group">
+                <label>ملاحظة / سبب الإيداع (اختياري)</label>
+                <input type="text" id="deposit-fund-note" placeholder="مثال: فائض يوم قديم، مكافأة...">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('quickDepositModal')">إلغاء</button>
+                <button type="button" class="primary-btn" onclick="saveQuickDeposit()"><i class="fas fa-check"></i> تأكيد الإيداع</button>
+            </div>
+        </div>
+    </div>
+
     <!-- نافذة تعديل الميزانية -->
     <div id="budgetEditModal" class="modal">
         <div class="modal-content">
@@ -1499,7 +1555,7 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل المصروف مع زر التعديل وزر الحذف في الترويسة -->
+    <!-- نافذة تفاصيل المصروف مع زر التعديل وزر الحذف -->
     <div id="expenseDetailsModal" class="modal">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:12px;">
@@ -1620,7 +1676,7 @@
 
         let activeCategoryDetailId = null;
         let activeExpenseDetailId = null;
-        let editingExpenseId = null; // للمتابعة عند تعديل المصروف
+        let editingExpenseId = null;
         let editingFundType = null;
         let pendingBudgetEditType = null;
         let pieChartInstance = null;
@@ -1709,6 +1765,14 @@
             renderDecisionsHistory();
             updateDateRangeDisplay();
             initCloudConnection();
+
+            // ضبط تاريخ اختيار الترحيل على اليوم الحالي تلقائياً
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('daily-rollover-date');
+            if (dateInput) {
+                dateInput.value = todayStr;
+                updateSelectedDayRolloverDisplay();
+            }
 
             window.onclick = function(event) {
                 if (event.target.classList.contains('modal')) {
@@ -2255,7 +2319,7 @@
                     row.innerHTML = `
                         <span class="text-danger" style="font-weight:bold;">- ${parseFloat(exp.amount).toLocaleString()} ${APP_STATE.currency}</span>
                         <div>
-                            <span>${exp.receiptImg ? '<i class="fas fa-paperclip text-primary"></i> ' : ''}${exp.store}</span>
+                            <span>${exp.receiptImg ? '<i class="fas fa-paperclip text-primary" style="margin-left:4px;"></i>' : ''}${exp.store}</span>
                             <span style="font-size:0.75em; color:var(--text-muted); margin-right:6px;">${exp.date.split('T')[0]}</span>
                         </div>
                     `;
@@ -2338,13 +2402,12 @@
             openModal('expenseDetailsModal');
         }
 
-        /* دالة فتح نافذة التعديل على المصروف المعتمد */
         function editCurrentExpense() {
             if (!activeExpenseDetailId) return;
             const exp = APP_STATE.expenses.find(e => e.id === activeExpenseDetailId);
             if (!exp) return;
 
-            editingExpenseId = exp.id; // تحديد المعرف لوضع التعديل
+            editingExpenseId = exp.id;
             closeModal('expenseDetailsModal');
 
             document.getElementById('expense-modal-title').innerText = 'تعديل المصروف';
@@ -2355,14 +2418,12 @@
             document.getElementById('exp-beneficiary').value = exp.beneficiary || '';
             document.getElementById('exp-category').value = exp.category;
             
-            // ضبط التاريخ
             if (exp.date) {
                 document.getElementById('exp-date').value = exp.date.slice(0, 16);
             }
 
             togglePaymentMethodFields();
 
-            // ضبط صورة الفاتورة إن وجدت
             if (exp.receiptImg) {
                 document.getElementById('receipt-preview-img').src = exp.receiptImg;
                 document.getElementById('receipt-preview-box').style.display = 'block';
@@ -2396,7 +2457,7 @@
         }
 
         function openExpenseModal() {
-            editingExpenseId = null; // إضافة جديدة
+            editingExpenseId = null;
             document.getElementById('expense-modal-title').innerText = 'إضافة مصروف جديد';
             document.getElementById('exp-amount').value = '';
             document.getElementById('exp-store').value = '';
@@ -2450,1216 +2511,4 @@
                     });
                     const resData = await res.json();
                     let raw = resData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    raw = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-                    const parsed = JSON.parse(raw);
-                    Object.assign(extracted, parsed);
-                } catch(e) {
-                    extracted = parseExpenseLocally(text);
-                }
-            } else {
-                extracted = parseExpenseLocally(text);
-            }
-
-            btn.innerHTML = '<i class="fas fa-magic"></i> تسجيل فوري';
-            btn.disabled = false;
-
-            if (!extracted.amount || extracted.amount <= 0) {
-                showToast('يرجى توضيح المبلغ بالأرقام', 'warning');
-                return;
-            }
-
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-
-            const newExp = {
-                id: 'exp-' + Date.now(),
-                amount: extracted.amount,
-                store: extracted.store || 'مصروف سريع',
-                method: extracted.method || 'بطاقة / شبكة',
-                bank: extracted.bank || '',
-                beneficiary: extracted.beneficiary || '',
-                category: extracted.category,
-                date: now.toISOString(),
-                receiptImg: null
-            };
-
-            APP_STATE.expenses.unshift(newExp);
-            saveLocalData();
-            closeModal('quickExpenseModal');
-            renderDashboard();
-            renderCategories();
-            renderRecentExpenses();
-            renderCalendar();
-
-            showToast(`⚡ تم تسجيل: ${newExp.store} (${newExp.amount} ${APP_STATE.currency}) بنجاح!`, 'success');
-        }
-
-        /* محرك استخراج وتحليل نصوص الفاتورة بدقة محاسبية ومنع الأرقام العشوائية */
-        function parseExpenseLocally(text) {
-            let amount = 0;
-            const lines = text.split('\n');
-
-            // 1. البحث عن الكلمات الدلالية للمبلغ الإجمالي
-            const totalKeywords = [
-                'المجموع الكلي', 'الإجمالي الكلي', 'المبلغ الإجمالي', 'المجموع', 'الإجمالي', 
-                'المستحق', 'صافي المبلغ', 'المبلغ المطلوب', 'total', 'net total', 'grand total', 
-                'amount due', 'total amount', 'balance due'
-            ];
-
-            // استبعاد أسطر الضريبة والسجل وأرقام الهاتف
-            const ignoreKeywords = ['الرقم الضريبي', 'سجل تجاري', 'vat', 'tax', 'هاتف', 'tel', 'phone', 'cr:'];
-
-            for (let line of lines) {
-                const lowerLine = line.toLowerCase();
-                const hasIgnore = ignoreKeywords.some(k => lowerLine.includes(k));
-                const hasTotal = totalKeywords.some(k => lowerLine.includes(k));
-
-                if (hasTotal && !hasIgnore) {
-                    const match = line.match(/(\d+[.,]\d{2}|\d+)/g);
-                    if (match) {
-                        const parsedCandidates = match.map(m => parseFloat(m.replace(',', '.'))).filter(n => n > 0 && n < 100000);
-                        if (parsedCandidates.length > 0) {
-                            amount = Math.max(...parsedCandidates); // اختيار المبلغ الإجمالي
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // في حال عدم العثور عبر الكلمات الدلالية، يتم استبعاد الأرقام الكبيرة مثل الرقم الضريبي (15 خانة)
-            if (!amount) {
-                const allNumbers = [];
-                for (let line of lines) {
-                    if (ignoreKeywords.some(k => line.toLowerCase().includes(k))) continue;
-                    const matches = line.match(/(?:^|\s)(\d{1,4}(?:[.,]\d{1,2})?)(?:\s|$|﷼|SAR|SR)/g);
-                    if (matches) {
-                        matches.forEach(m => {
-                            const val = parseFloat(m.replace(/[^\d.,]/g, '').replace(',', '.'));
-                            if (val > 0.5 && val < 10000) allNumbers.push(val);
-                        });
-                    }
-                }
-                if (allNumbers.length > 0) {
-                    amount = Math.max(...allNumbers);
-                }
-            }
-
-            // تحديد طريقة الدفع
-            let method = 'بطاقة / شبكة';
-            if (text.includes('كاش') || text.includes('نقدا') || text.includes('نقد') || text.toLowerCase().includes('cash')) {
-                method = 'كاش';
-            } else if (text.includes('تحويل') || text.includes('حولت') || text.toLowerCase().includes('transfer')) {
-                method = 'تحويل بنكي';
-            }
-
-            // تحديد البنك
-            let bank = '';
-            const banks = ['الراجحي', 'الأهلي', 'الإنماء', 'الرياض', 'البلاد', 'الفرنسي', 'ساب', 'العربي'];
-            banks.forEach(b => { if (text.includes(b)) bank = 'بنك ' + b; });
-
-            let beneficiary = '';
-            const toMatch = text.match(/لـ?([^\s,]+)/);
-            if (toMatch && method === 'تحويل بنكي') beneficiary = toMatch[1];
-
-            // تحديد البند الأنسب بدقة
-            let category = APP_STATE.categories[0]?.name || 'المقاضي والمواد الغذائية';
-            const lower = text.toLowerCase();
-
-            if (lower.includes('بنده') || lower.includes('مقاضي') || lower.includes('سوبرماركت') || lower.includes('بقالة') || lower.includes('العثيم') || lower.includes('لولو') || lower.includes('تموينات') || lower.includes('ماركت')) {
-                category = APP_STATE.categories.find(c => c.name.includes('المقاضي') || c.name.includes('غذائية'))?.name || category;
-            } else if (lower.includes('بنزين') || lower.includes('محطة') || lower.includes('دريس') || lower.includes('ساسكو') || lower.includes('سيارة') || lower.includes('زيت') || lower.includes('petrol') || lower.includes('fuel')) {
-                category = APP_STATE.categories.find(c => c.name.includes('السيارة') || c.name.includes('بنزين'))?.name || category;
-            } else if (lower.includes('مطعم') || lower.includes('كافيه') || lower.includes('قهوة') || lower.includes('البيك') || lower.includes('ماك') || lower.includes('شاورما') || lower.includes('عشاء') || lower.includes('restaurant') || lower.includes('cafe')) {
-                category = APP_STATE.categories.find(c => c.name.includes('المطاعم') || c.name.includes('الترفيه'))?.name || category;
-            } else if (lower.includes('فاتورة') || lower.includes('كهرباء') || lower.includes('مياه') || lower.includes('نت') || lower.includes('stc') || lower.includes('موبايلي') || lower.includes('telecom')) {
-                category = APP_STATE.categories.find(c => c.name.includes('الفواتير') || c.name.includes('الالتزامات'))?.name || category;
-            }
-
-            // استخراج اسم المتجر من السطور الأولى النظيفة
-            let store = '';
-            for (let l of lines) {
-                let clean = l.replace(/فاتورة|ضريبية|مبسطة|شركة|مؤسسة|فرع|tax|invoice|pos/gi, '').trim();
-                if (clean.length >= 3 && clean.length <= 35 && isNaN(clean) && !clean.includes('15%')) {
-                    store = clean;
-                    break;
-                }
-            }
-            if (!store) store = 'مشتريات فاتورة';
-
-            return { amount, store, category, method, bank, beneficiary };
-        }
-
-        function saveExpense() {
-            const amount = parseFloat(document.getElementById('exp-amount').value);
-            const store = document.getElementById('exp-store').value.trim();
-            const method = document.getElementById('exp-method').value;
-            const bank = document.getElementById('exp-bank').value.trim();
-            const beneficiary = document.getElementById('exp-beneficiary').value.trim();
-            const category = document.getElementById('exp-category').value;
-            const dateVal = document.getElementById('exp-date').value;
-            const receiptImg = document.getElementById('receipt-preview-img').src || null;
-
-            if (isNaN(amount) || amount <= 0) {
-                showToast('يرجى إدخال مبلغ صحيح', 'warning');
-                return;
-            }
-            if (!store) {
-                showToast('يرجى إدخال اسم المحل', 'warning');
-                return;
-            }
-
-            if (editingExpenseId) {
-                // تعديل مصروف معتمد موجود مسبقاً
-                const expIndex = APP_STATE.expenses.findIndex(e => e.id === editingExpenseId);
-                if (expIndex !== -1) {
-                    APP_STATE.expenses[expIndex] = {
-                        ...APP_STATE.expenses[expIndex],
-                        amount: amount,
-                        store: store,
-                        method: method,
-                        bank: bank,
-                        beneficiary: beneficiary,
-                        category: category,
-                        date: dateVal || APP_STATE.expenses[expIndex].date,
-                        receiptImg: receiptImg && receiptImg.startsWith('data:image') ? receiptImg : APP_STATE.expenses[expIndex].receiptImg
-                    };
-                    showToast('تم تعديل المصروف وتحديث الحسابات بنجاح!', 'success');
-                }
-                editingExpenseId = null;
-            } else {
-                // إضافة مصروف جديد
-                const newExp = {
-                    id: 'exp-' + Date.now(),
-                    amount: amount,
-                    store: store,
-                    method: method,
-                    bank: bank,
-                    beneficiary: beneficiary,
-                    category: category,
-                    date: dateVal || new Date().toISOString(),
-                    receiptImg: receiptImg && receiptImg.startsWith('data:image') ? receiptImg : null
-                };
-                APP_STATE.expenses.unshift(newExp);
-                showToast('تم حفظ المصروف بنجاح!', 'success');
-            }
-
-            saveLocalData();
-            closeModal('expenseModal');
-            renderDashboard();
-            renderCategories();
-            renderRecentExpenses();
-            renderCalendar();
-        }
-
-        function openEditBudgetModal(type) {
-            pendingBudgetEditType = type;
-            const title = document.getElementById('budget-edit-title');
-            const dateFields = document.getElementById('monthly-budget-date-fields');
-            const amountInput = document.getElementById('budget-edit-amount');
-
-            if (type === 'monthly') {
-                title.innerText = 'تعديل الميزانية وفترتها';
-                amountInput.value = APP_STATE.monthlyBudget;
-                dateFields.style.display = 'block';
-                document.getElementById('budget-edit-month').value = APP_STATE.selectedMonth;
-                document.getElementById('budget-edit-start-date').value = APP_STATE.budgetStartDate;
-                document.getElementById('budget-edit-end-date').value = APP_STATE.budgetEndDate;
-            } else {
-                title.innerText = 'تعديل الميزانية اليومية';
-                amountInput.value = APP_STATE.dailyBudget;
-                dateFields.style.display = 'none';
-            }
-
-            openModal('budgetEditModal');
-        }
-
-        function saveBudgetEdit() {
-            const amount = parseFloat(document.getElementById('budget-edit-amount').value);
-            if (isNaN(amount) || amount <= 0) {
-                showToast('يرجى كتابة مبلغ صحيح', 'warning');
-                return;
-            }
-
-            if (pendingBudgetEditType === 'monthly') {
-                APP_STATE.monthlyBudget = amount;
-                APP_STATE.selectedMonth = document.getElementById('budget-edit-month').value || APP_STATE.selectedMonth;
-                APP_STATE.budgetStartDate = document.getElementById('budget-edit-start-date').value || APP_STATE.budgetStartDate;
-                APP_STATE.budgetEndDate = document.getElementById('budget-edit-end-date').value || APP_STATE.budgetEndDate;
-                updateDateRangeDisplay();
-            } else {
-                APP_STATE.dailyBudget = amount;
-            }
-
-            saveLocalData();
-            closeModal('budgetEditModal');
-            renderDashboard();
-            showToast('تم الحفظ بنجاح!', 'success');
-        }
-
-        function openNewCategoryModal() {
-            document.getElementById('cat-new-name').value = '';
-            document.getElementById('cat-new-budget').value = '';
-            openModal('categoryModal');
-        }
-
-        function saveNewCategory() {
-            const name = document.getElementById('cat-new-name').value.trim();
-            const budget = parseFloat(document.getElementById('cat-new-budget').value);
-
-            if (!name || isNaN(budget) || budget <= 0) {
-                showToast('يرجى تعبئة الحقول بشكل صحيح', 'warning');
-                return;
-            }
-
-            APP_STATE.categories.push({
-                id: 'cat-' + Date.now(),
-                name: name,
-                budget: budget,
-                icon: 'fa-tags'
-            });
-
-            saveLocalData();
-            closeModal('categoryModal');
-            renderCategories();
-            showToast('تمت إضافة البند بنجاح!', 'success');
-        }
-
-        function renderSavingsPage() {
-            const dailySpent = calculateDailySpent();
-            const dailyRemaining = Math.max(0, APP_STATE.dailyBudget - dailySpent);
-            document.getElementById('savings-daily-remaining').innerText = dailyRemaining.toLocaleString() + ' ' + APP_STATE.currency;
-
-            const monthlySpent = calculateMonthlySpent();
-            const monthlyRemaining = Math.max(0, APP_STATE.monthlyBudget - monthlySpent);
-            document.getElementById('savings-monthly-remaining').innerText = monthlyRemaining.toLocaleString() + ' ' + APP_STATE.currency;
-
-            document.getElementById('emergency-fund-balance').innerText = (APP_STATE.savings.emergency || 0).toLocaleString() + ' ' + APP_STATE.currency;
-            document.getElementById('investment-fund-balance').innerText = (APP_STATE.savings.investment || 0).toLocaleString() + ' ' + APP_STATE.currency;
-
-            const container = document.getElementById('rollover-history-container');
-            const history = APP_STATE.savings.rolloverHistory || [];
-
-            if (history.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted); font-size:0.85em; padding:8px;">لا توجد عمليات ترحيل فائض.</div>';
-                return;
-            }
-
-            container.innerHTML = '';
-            history.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'stat-row';
-                row.style.background = 'var(--surface-card)';
-                row.style.padding = '8px 12px';
-                row.style.borderRadius = '8px';
-                row.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span class="text-success" style="font-weight:bold;">+ ${item.amount.toLocaleString()} ${APP_STATE.currency}</span>
-                        <span style="font-size:0.8em; color:var(--text-muted);">إلى ${item.target === 'emergency' ? 'الطوارئ' : 'الاستثمار'}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <button class="btn-edit-badge" style="color:var(--danger); border-color:var(--danger);" onclick="revertRollover('${item.id}')"><i class="fas fa-undo"></i> إلغاء</button>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function executeDailyRollover() {
-            const dailySpent = calculateDailySpent();
-            const dailyRemaining = Math.max(0, APP_STATE.dailyBudget - dailySpent);
-            if (dailyRemaining <= 0) {
-                showToast('لا يوجد فائض لترحيله اليوم!', 'warning');
-                return;
-            }
-
-            const target = document.getElementById('daily-rollover-target').value;
-            const record = {
-                id: 'roll-' + Date.now(),
-                type: 'daily',
-                amount: dailyRemaining,
-                target: target,
-                date: new Date().toISOString().split('T')[0]
-            };
-
-            if (target === 'emergency') APP_STATE.savings.emergency = (APP_STATE.savings.emergency || 0) + dailyRemaining;
-            else APP_STATE.savings.investment = (APP_STATE.savings.investment || 0) + dailyRemaining;
-
-            APP_STATE.savings.rolloverHistory = APP_STATE.savings.rolloverHistory || [];
-            APP_STATE.savings.rolloverHistory.unshift(record);
-
-            saveLocalData();
-            renderSavingsPage();
-            showToast(`تم ترحيل ${dailyRemaining} ${APP_STATE.currency} بنجاح!`, 'success');
-        }
-
-        function executeMonthlyRollover() {
-            const monthlySpent = calculateMonthlySpent();
-            const monthlyRemaining = Math.max(0, APP_STATE.monthlyBudget - monthlySpent);
-            if (monthlyRemaining <= 0) {
-                showToast('لا يوجد فائض مالي متبقي في الشهر!', 'warning');
-                return;
-            }
-
-            const target = document.getElementById('monthly-rollover-target').value;
-            const record = {
-                id: 'roll-' + Date.now(),
-                type: 'monthly',
-                amount: monthlyRemaining,
-                target: target,
-                date: new Date().toISOString().split('T')[0]
-            };
-
-            if (target === 'emergency') APP_STATE.savings.emergency = (APP_STATE.savings.emergency || 0) + monthlyRemaining;
-            else APP_STATE.savings.investment = (APP_STATE.savings.investment || 0) + monthlyRemaining;
-
-            APP_STATE.savings.rolloverHistory = APP_STATE.savings.rolloverHistory || [];
-            APP_STATE.savings.rolloverHistory.unshift(record);
-
-            saveLocalData();
-            renderSavingsPage();
-            showToast(`تم ترحيل الفائض الشهري ${monthlyRemaining} ${APP_STATE.currency} بنجاح!`, 'success');
-        }
-
-        function revertRollover(recordId) {
-            const history = APP_STATE.savings.rolloverHistory || [];
-            const item = history.find(h => h.id === recordId);
-            if (!item) return;
-
-            if (item.target === 'emergency') {
-                APP_STATE.savings.emergency = Math.max(0, (APP_STATE.savings.emergency || 0) - item.amount);
-            } else {
-                APP_STATE.savings.investment = Math.max(0, (APP_STATE.savings.investment || 0) - item.amount);
-            }
-
-            APP_STATE.savings.rolloverHistory = history.filter(h => h.id !== recordId);
-            saveLocalData();
-            renderSavingsPage();
-            showToast('تم إلغاء الترحيل واسترجاع المبلغ!', 'success');
-        }
-
-        function openFundEditModal(type) {
-            editingFundType = type;
-            document.getElementById('fund-edit-title').innerText = type === 'emergency' ? 'تعديل رصيد الطوارئ' : 'تعديل رصيد الاستثمار';
-            document.getElementById('fund-edit-balance').value = type === 'emergency' ? (APP_STATE.savings.emergency || 0) : (APP_STATE.savings.investment || 0);
-            openModal('fundEditModal');
-        }
-
-        function saveFundEdit() {
-            const val = parseFloat(document.getElementById('fund-edit-balance').value);
-            if (isNaN(val) || val < 0) {
-                showToast('يرجى إدخال مبلغ صحيح', 'warning');
-                return;
-            }
-            if (editingFundType === 'emergency') APP_STATE.savings.emergency = val;
-            else APP_STATE.savings.investment = val;
-
-            saveLocalData();
-            closeModal('fundEditModal');
-            renderSavingsPage();
-            showToast('تم تحديث الرصيد بنجاح!', 'success');
-        }
-
-        function renderDebtsPage() {
-            const list = APP_STATE.debts || [];
-            let owedTotal = 0;
-            let dueTotal = 0;
-
-            const container = document.getElementById('debts-list-container');
-            container.innerHTML = '';
-
-            list.forEach(d => {
-                if (d.type === 'owed') owedTotal += parseFloat(d.amount);
-                else dueTotal += parseFloat(d.amount);
-
-                const item = document.createElement('div');
-                item.className = 'stat-row';
-                item.style.background = 'var(--surface-card)';
-                item.style.padding = '10px 14px';
-                item.style.borderRadius = '8px';
-                item.innerHTML = `
-                    <div>
-                        <span style="font-weight:bold; font-size:1.05em; color:${d.type === 'owed' ? 'var(--danger)' : 'var(--success)'};">${parseFloat(d.amount).toLocaleString()} ${APP_STATE.currency}</span>
-                        <div style="font-size:0.8em; color:var(--text-muted);">${d.type === 'owed' ? 'دين لـ' : 'سلفة من'} <strong>${d.person}</strong></div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <button class="btn-edit-badge" style="color:var(--danger); border-color:var(--danger);" onclick="deleteDebt('${d.id}')"><i class="fas fa-trash"></i> سداد</button>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-
-            document.getElementById('total-debts-owed').innerText = owedTotal.toLocaleString() + ' ' + APP_STATE.currency;
-            document.getElementById('total-debts-due').innerText = dueTotal.toLocaleString() + ' ' + APP_STATE.currency;
-        }
-
-        function openNewDebtModal() {
-            document.getElementById('debt-person').value = '';
-            document.getElementById('debt-amount').value = '';
-            document.getElementById('debt-due-date').value = '';
-            openModal('newDebtModal');
-        }
-
-        function saveNewDebt() {
-            const type = document.getElementById('debt-type').value;
-            const person = document.getElementById('debt-person').value.trim();
-            const amount = parseFloat(document.getElementById('debt-amount').value);
-            const dueDate = document.getElementById('debt-due-date').value;
-
-            if (!person || isNaN(amount) || amount <= 0) {
-                showToast('يرجى تعبئة كافة الحقول', 'warning');
-                return;
-            }
-
-            APP_STATE.debts = APP_STATE.debts || [];
-            APP_STATE.debts.push({
-                id: 'debt-' + Date.now(),
-                type: type,
-                person: person,
-                amount: amount,
-                dueDate: dueDate
-            });
-
-            saveLocalData();
-            closeModal('newDebtModal');
-            renderDebtsPage();
-            showToast('تمت الإضافة بنجاح!', 'success');
-        }
-
-        function deleteDebt(debtId) {
-            APP_STATE.debts = APP_STATE.debts.filter(d => d.id !== debtId);
-            saveLocalData();
-            renderDebtsPage();
-            showToast('تم حذف القيد!', 'success');
-        }
-
-        let calendarCurrentDate = new Date();
-
-        function renderCalendar() {
-            const year = calendarCurrentDate.getFullYear();
-            const month = calendarCurrentDate.getMonth();
-            const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
-
-            const grid = document.getElementById('calendar-days-grid');
-            grid.innerHTML = '';
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            for (let i = 0; i < firstDayIndex; i++) {
-                const empty = document.createElement('div');
-                grid.appendChild(empty);
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayExpenses = APP_STATE.expenses.filter(e => e.date && e.date.startsWith(dayStr));
-                const daySpent = dayExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
-
-                const cell = document.createElement('div');
-                cell.style.border = '1px solid var(--border-color)';
-                cell.style.borderRadius = '6px';
-                cell.style.padding = '4px 2px';
-                cell.style.textAlign = 'center';
-                cell.style.minHeight = '50px';
-                cell.style.background = 'var(--surface-card)';
-                cell.style.display = 'flex';
-                cell.style.flexDirection = 'column';
-                cell.style.justifyContent = 'space-between';
-
-                cell.innerHTML = `
-                    <div style="font-weight:bold; font-size:0.75em;">${day}</div>
-                    ${daySpent > 0 ? `<div style="font-size:0.65em; color:var(--danger); font-weight:bold;">-${daySpent.toLocaleString()}</div>` : '<div style="font-size:0.65em; color:var(--text-muted);">-</div>'}
-                `;
-                grid.appendChild(cell);
-            }
-        }
-
-        function changeCalendarMonth(delta) {
-            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        function toggleDecisionTypeFields() {
-            const type = document.getElementById('sim-decision-type').value;
-            const investBox = document.getElementById('sim-invest-fields');
-            const nameLabel = document.getElementById('sim-name-label');
-            const costLabel = document.getElementById('sim-cost-label');
-            const catGroup = document.getElementById('sim-cat-group');
-
-            if (type === 'investment') {
-                investBox.style.display = 'block';
-                nameLabel.innerText = 'اسم المشروع أو الأصل';
-                costLabel.innerText = 'مبلغ الاستثمار (﷼)';
-                catGroup.style.display = 'none';
-            } else {
-                investBox.style.display = 'none';
-                nameLabel.innerText = 'اسم الغرض أو الخدمة';
-                costLabel.innerText = 'المبلغ المقدر (﷼)';
-                catGroup.style.display = 'block';
-            }
-        }
-
-        function clearSimulatorInputs() {
-            document.getElementById('sim-item-name').value = '';
-            document.getElementById('sim-item-cost').value = '';
-            document.getElementById('sim-invest-roi').value = '';
-            document.getElementById('sim-invest-months').value = '';
-            document.getElementById('sim-result-box').style.display = 'none';
-        }
-
-        function runDecisionSimulator() {
-            const type = document.getElementById('sim-decision-type').value;
-            const name = document.getElementById('sim-item-name').value.trim();
-            const cost = parseFloat(document.getElementById('sim-item-cost').value);
-            const box = document.getElementById('sim-result-box');
-
-            if (!name || isNaN(cost) || cost <= 0) {
-                showToast('يرجى كتابة الاسم والمبلغ', 'warning');
-                return;
-            }
-
-            const monthlySpent = calculateMonthlySpent();
-            const monthlyRemaining = Math.max(0, APP_STATE.monthlyBudget - monthlySpent);
-            let analysis = '';
-            let isSafe = false;
-
-            if (type === 'purchase') {
-                const catName = document.getElementById('sim-item-cat').value;
-                const cat = APP_STATE.categories.find(c => c.name === catName);
-                const catSpent = APP_STATE.expenses.filter(e => e.category === catName).reduce((s, e) => s + parseFloat(e.amount), 0);
-                const catRem = cat ? Math.max(0, cat.budget - catSpent) : 0;
-
-                if (cost <= catRem) {
-                    isSafe = true;
-                    analysis = `✅ <strong>قرار ممتاز:</strong> مخصص بند (${catName}) به فائض ${catRem} ﷼، والشراء آمن.`;
-                } else if (cost <= monthlyRemaining) {
-                    analysis = `⚠️ <strong>حرج:</strong> المبلغ يتجاوز مخصص البند لكنه ضمن المتبقي الكلي (${monthlyRemaining} ﷼).`;
-                } else {
-                    analysis = `❌ <strong>تحذير:</strong> هذا الشراء سيتسبب في عجز مالي قدره ${Math.abs(monthlyRemaining - cost)} ﷼.`;
-                }
-            } else {
-                const roi = parseFloat(document.getElementById('sim-invest-roi').value) || 10;
-                const months = parseInt(document.getElementById('sim-invest-months').value) || 12;
-                const expectedReturn = Math.round(cost * (roi / 100) * (months / 12));
-
-                isSafe = cost <= (APP_STATE.savings.investment || 0) + monthlyRemaining;
-                analysis = `📊 <strong>تحليل:</strong> استثمار ${cost} ﷼ بعائد متوقع ${roi}% قد يربح <strong>${expectedReturn} ﷼</strong>.`;
-            }
-
-            box.style.display = 'block';
-            box.style.background = isSafe ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)';
-            box.style.border = isSafe ? '1px solid var(--success)' : '1px solid var(--danger)';
-            box.innerHTML = analysis;
-
-            APP_STATE.decisionsHistory = APP_STATE.decisionsHistory || [];
-            APP_STATE.decisionsHistory.unshift({
-                id: 'dec-' + Date.now(),
-                type: type,
-                name: name,
-                cost: cost,
-                date: new Date().toISOString().split('T')[0],
-                analysis: analysis
-            });
-
-            saveLocalData();
-            renderDecisionsHistory();
-            showToast('تم حفظ القرار في السجل!', 'success');
-        }
-
-        function renderDecisionsHistory() {
-            const container = document.getElementById('decision-history-container');
-            const history = APP_STATE.decisionsHistory || [];
-
-            if (history.length === 0) {
-                container.innerHTML = '<div style="color:var(--text-muted); font-size:0.82em; padding:6px;">لا توجد قرارات مسجلة.</div>';
-                return;
-            }
-
-            container.innerHTML = '';
-            history.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'stat-row';
-                row.style.background = 'var(--surface-card)';
-                row.style.padding = '8px 12px';
-                row.style.borderRadius = '8px';
-                row.innerHTML = `
-                    <div>
-                        <strong>${item.name}</strong> <span style="font-size:0.8em; color:var(--text-muted);">(${item.cost.toLocaleString()} ${APP_STATE.currency})</span>
-                        <div style="font-size:0.78em; margin-top:2px;">${item.analysis}</div>
-                    </div>
-                    <button class="btn-edit-badge" style="color:var(--danger); border-color:var(--danger);" onclick="deleteDecision('${item.id}')"><i class="fas fa-trash"></i></button>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function deleteDecision(id) {
-            APP_STATE.decisionsHistory = APP_STATE.decisionsHistory.filter(d => d.id !== id);
-            saveLocalData();
-            renderDecisionsHistory();
-            showToast('تم حذف القرار', 'info');
-        }
-
-        function toggleVoiceInput(targetInputId, btnId) {
-            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRec) {
-                showToast('المتصفح لا يدعم التسجيل الصوتي', 'warning');
-                return;
-            }
-
-            if (!speechRecognitionInstance) {
-                speechRecognitionInstance = new SpeechRec();
-                speechRecognitionInstance.lang = 'ar-SA';
-                speechRecognitionInstance.continuous = false;
-                speechRecognitionInstance.interimResults = false;
-            }
-
-            const btn = document.getElementById(btnId);
-
-            if (isRecording) {
-                speechRecognitionInstance.stop();
-                isRecording = false;
-                btn.style.color = 'var(--text-main)';
-            } else {
-                speechRecognitionInstance.start();
-                isRecording = true;
-                btn.style.color = 'var(--danger)';
-                showToast('تحدث الآن...', 'info');
-
-                speechRecognitionInstance.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById(targetInputId).value = transcript;
-                    isRecording = false;
-                    btn.style.color = 'var(--text-main)';
-                };
-
-                speechRecognitionInstance.onerror = function() {
-                    isRecording = false;
-                    btn.style.color = 'var(--text-main)';
-                };
-            }
-        }
-
-        function toggleAdvisorChat() {
-            const win = document.getElementById('advisor-chat-window');
-            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            appendChatBubble('user', msg, 'chat-messages');
-            input.value = '';
-
-            const botReply = await generateAdvisorResponse(msg);
-            appendChatBubble('bot', botReply, 'chat-messages');
-        }
-
-        async function sendInlineChatMessage() {
-            const input = document.getElementById('inline-chat-input');
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            appendChatBubble('user', msg, 'inline-chat-messages');
-            input.value = '';
-
-            const botReply = await generateAdvisorResponse(msg);
-            appendChatBubble('bot', botReply, 'inline-chat-messages');
-        }
-
-        function appendChatBubble(role, text, containerId) {
-            const container = document.getElementById(containerId);
-            const bubble = document.createElement('div');
-            bubble.className = role === 'user' ? 'message user-message' : 'message bot-message';
-            bubble.innerHTML = text;
-            container.appendChild(bubble);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function generateAdvisorResponse(userQuery) {
-            const monthlySpent = calculateMonthlySpent();
-            const monthlyRemaining = Math.max(0, APP_STATE.monthlyBudget - monthlySpent);
-            const dailySpent = calculateDailySpent();
-            const dailyRemaining = Math.max(0, APP_STATE.dailyBudget - dailySpent);
-
-            if (APP_STATE.geminiApiKey) {
-                try {
-                    const prompt = `أنت مستشار مالي ذكي. بيانات المستخدم: المقررة: ${APP_STATE.monthlyBudget} ${APP_STATE.currency}، المنصرف: ${monthlySpent} ${APP_STATE.currency}، المتبقي: ${monthlyRemaining} ${APP_STATE.currency}، اليومي: ${APP_STATE.dailyBudget}، منصرف اليوم: ${dailySpent}. أجب باختصار وذكاء: "${userQuery}"`;
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${APP_STATE.geminiApiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                    });
-                    const resData = await res.json();
-                    return resData.candidates?.[0]?.content?.parts?.[0]?.text || 'أنا معك! وضعك المالي مستقر حالياً.';
-                } catch (e) {}
-            }
-
-            if (userQuery.includes('توفير') || userQuery.includes('وفر')) {
-                return `متبقي ميزانيتك الشهرية هو <strong>${monthlyRemaining} ${APP_STATE.currency}</strong>. أنصحك بترحيل الفائض يومياً للادخار.`;
-            } else {
-                return `ميزانيتك الشهرية متبقي منها ${monthlyRemaining} ${APP_STATE.currency}. كيف تحب أن أساعدك؟`;
-            }
-        }
-
-        function initCharts() {
-            const ctx1 = document.getElementById('myChart')?.getContext('2d');
-            const ctx2 = document.getElementById('myLineChart')?.getContext('2d');
-            if (!ctx1 || !ctx2) return;
-
-            pieChartInstance = new Chart(ctx1, {
-                type: 'doughnut',
-                data: {
-                    labels: APP_STATE.categories.map(c => c.name),
-                    datasets: [{
-                        data: APP_STATE.categories.map(c => c.budget),
-                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            lineChartInstance = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: ['اليوم 1', 'اليوم 2', 'اليوم 3', 'اليوم 4', 'اليوم 5'],
-                    datasets: [{
-                        label: 'الإنفاق اليومي',
-                        data: [120, 190, 80, 240, 110],
-                        borderColor: '#2563eb',
-                        tension: 0.3,
-                        fill: true,
-                        backgroundColor: 'rgba(37,99,235,0.1)'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        function updateCharts() {
-            if (!pieChartInstance) return;
-            pieChartInstance.data.labels = APP_STATE.categories.map(c => c.name);
-            pieChartInstance.data.datasets[0].data = APP_STATE.categories.map(cat => {
-                return APP_STATE.expenses
-                    .filter(e => e.category === cat.name)
-                    .reduce((sum, e) => sum + parseFloat(e.amount), 0) || cat.budget;
-            });
-            pieChartInstance.update();
-        }
-
-        function calculateMonthlySpent() {
-            return (APP_STATE.expenses || []).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-        }
-
-        function calculateDailySpent() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            return (APP_STATE.expenses || []).filter(e => e.date && e.date.startsWith(todayStr)).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
-        }
-
-        function updateDateRangeDisplay() {
-            const el = document.getElementById('display-selected-month');
-            if (el) {
-                if (APP_STATE.budgetStartDate && APP_STATE.budgetEndDate) {
-                    el.innerText = `(${APP_STATE.budgetStartDate} إلى ${APP_STATE.budgetEndDate})`;
-                } else {
-                    el.innerText = `(${APP_STATE.selectedMonth || 'الشهر الحالي'})`;
-                }
-            }
-        }
-
-        function handleReceiptSelected(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const previewImg = document.getElementById('receipt-preview-img');
-                const previewBox = document.getElementById('receipt-preview-box');
-                const promptBox = document.getElementById('receipt-upload-prompt');
-                const btnAi = document.getElementById('btn-process-ai');
-                previewImg.src = evt.target.result;
-                previewBox.style.display = 'block';
-                promptBox.style.display = 'none';
-                btnAi.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearReceiptImage() {
-            const input = document.getElementById('receipt-file-input');
-            if (input) input.value = '';
-            const previewImg = document.getElementById('receipt-preview-img');
-            if (previewImg) previewImg.src = '';
-            const previewBox = document.getElementById('receipt-preview-box');
-            if (previewBox) previewBox.style.display = 'none';
-            const promptBox = document.getElementById('receipt-upload-prompt');
-            if (promptBox) promptBox.style.display = 'block';
-            const btnAi = document.getElementById('btn-process-ai');
-            if (btnAi) btnAi.style.display = 'none';
-        }
-
-        /* قراءة الفاتورة بالذكاء الاصطناعي بدقة فائقة وبدون عشوائية */
-        async function processReceiptAI() {
-            const previewImg = document.getElementById('receipt-preview-img');
-            if (!previewImg || !previewImg.src) return;
-            const loading = document.getElementById('ai-loading-indicator');
-            const btnAi = document.getElementById('btn-process-ai');
-            loading.style.display = 'block';
-            btnAi.disabled = true;
-
-            let extracted = null;
-
-            // 1. الأولوية: استخدام Google Gemini Vision المباشر لتحليل الصورة بدقة
-            if (APP_STATE.geminiApiKey) {
-                try {
-                    const base64Data = previewImg.src.split(',')[1];
-                    const mimeType = previewImg.src.split(';')[0].split(':')[1] || 'image/jpeg';
-                    const catNames = APP_STATE.categories.map(c => c.name).join(', ');
-
-                    const prompt = `أنت مدقق مالي ذكي. انظر إلى صورة الفاتورة المرفقة واستخرج منها البيانات بدقة متناهية:
-1. المبلغ الإجمالي النهائي المدفوع (ابحث عن: المجموع الكلي، Total، الإجمالي شامل الضريبة، أو المبلغ المدفوع). تجنب تماماً أخذ الرقم الضريبي أو رقم الفاتورة أو الضريبة المنفصلة.
-2. اسم المحل أو المتجر بوضوح.
-3. طريقة الدفع (إذا رأيت شبكة أو مدى أو فيزا أو بطاقة سجل "بطاقة / شبكة"، وإذا نقد سجل "كاش").
-4. اسم البند الأنسب من هذه البنود حصراً: [${catNames}].
-أرجع الإجابة فقط بصيغة JSON بدون مارك داون:
-{"amount": رقم_عشري, "store": "اسم المتجر", "category": "البند", "method": "طريقة الدفع"}`;
-
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${APP_STATE.geminiApiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [
-                                    { text: prompt },
-                                    { inline_data: { mime_type: mimeType, data: base64Data } }
-                                ]
-                            }]
-                        })
-                    });
-
-                    const resData = await res.json();
-                    let rawText = resData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-                    extracted = JSON.parse(rawText);
-                } catch (geminiErr) {
-                    console.warn('Gemini vision parse error, falling back to Tesseract OCR:', geminiErr);
-                }
-            }
-
-            // 2. البديل المحلي: Tesseract OCR مع فلترة السطور المحاسبية
-            if (!extracted || !extracted.amount) {
-                try {
-                    if (typeof Tesseract !== 'undefined') {
-                        const result = await Tesseract.recognize(previewImg.src, 'ara+eng');
-                        const text = result.data.text;
-                        extracted = parseExpenseLocally(text);
-                    }
-                } catch (tesseractErr) {
-                    console.error('Tesseract failed:', tesseractErr);
-                }
-            }
-
-            loading.style.display = 'none';
-            btnAi.disabled = false;
-
-            if (extracted && extracted.amount > 0) {
-                document.getElementById('exp-amount').value = extracted.amount;
-                if (extracted.store && extracted.store !== 'مشتريات فاتورة') {
-                    document.getElementById('exp-store').value = extracted.store;
-                }
-                if (extracted.category) {
-                    document.getElementById('exp-category').value = extracted.category;
-                }
-                if (extracted.method) {
-                    document.getElementById('exp-method').value = extracted.method;
-                    togglePaymentMethodFields();
-                }
-                showToast(`✅ تم استخراج الإجمالي: ${extracted.amount} ${APP_STATE.currency} والمتجر: ${extracted.store}`, 'success');
-            } else {
-                showToast('تعذر استخراج المبلغ بدقة، يرجى كتابته يدوياً', 'warning');
-            }
-        }
-
-        function openLightbox(imgSrc) {
-            if (!imgSrc) return;
-            const modal = document.getElementById('imageLightboxModal');
-            const img = document.getElementById('lightbox-expanded-img');
-            if (modal && img) {
-                img.src = imgSrc;
-                modal.style.display = 'flex';
-            }
-        }
-
-        function closeLightbox(e) {
-            if (e) e.stopPropagation();
-            const modal = document.getElementById('imageLightboxModal');
-            if (modal) modal.style.display = 'none';
-        }
-
-        function deleteCurrentExpense() {
-            if (!activeExpenseDetailId) return;
-            APP_STATE.expenses = APP_STATE.expenses.filter(e => e.id !== activeExpenseDetailId);
-            saveLocalData();
-            closeModal('expenseDetailsModal');
-            renderDashboard();
-            renderCategories();
-            renderRecentExpenses();
-            renderCalendar();
-            showToast('تم حذف المصروف', 'info');
-        }
-
-        function printReceiptWindow() {
-            const content = document.getElementById('expense-printable-receipt').innerHTML;
-            const printWin = window.open('', '_blank', 'width=500,height=650');
-            printWin.document.write(`
-                <html dir="rtl">
-                <head><title>إيصال مصروف</title><style>body{font-family:sans-serif;padding:15px;} .stat-row{display:flex;justify-content:space-between;margin:6px 0;border-bottom:1px solid #ddd;padding-bottom:4px;}</style></head>
-                <body>${content}</body>
-                </html>
-            `);
-            printWin.document.close();
-            printWin.focus();
-            setTimeout(() => { printWin.print(); printWin.close(); }, 500);
-        }
-
-        function triggerFileDownload(blob, filename) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 1500);
-        }
-
-        function buildFinancialReportContainer() {
-            const monthlySpent = calculateMonthlySpent();
-            const monthlyDiff = APP_STATE.monthlyBudget - monthlySpent;
-            const spentPercent = APP_STATE.monthlyBudget > 0 ? Math.round((monthlySpent / APP_STATE.monthlyBudget) * 100) : 0;
-            const now = new Date();
-            const nowStr = now.toLocaleDateString('ar-SA') + ' ' + now.toLocaleTimeString('ar-SA');
-            const periodStr = (APP_STATE.budgetStartDate && APP_STATE.budgetEndDate) 
-                ? `${APP_STATE.budgetStartDate} إلى ${APP_STATE.budgetEndDate}` 
-                : APP_STATE.selectedMonth;
-
-            let catRows = '';
-            APP_STATE.categories.forEach(cat => {
-                const spent = APP_STATE.expenses
-                    .filter(e => e.category === cat.name)
-                    .reduce((s, e) => s + parseFloat(e.amount), 0);
-                const rem = Math.max(0, cat.budget - spent);
-                const pct = cat.budget > 0 ? Math.min(100, Math.round((spent / cat.budget) * 100)) : 0;
-                catRows += `
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 6px 8px; font-weight: 600;">${cat.name}</td>
-                        <td style="padding: 6px 8px; text-align: center;">${cat.budget.toLocaleString()}</td>
-                        <td style="padding: 6px 8px; text-align: center; color: #dc2626;">${spent.toLocaleString()}</td>
-                        <td style="padding: 6px 8px; text-align: center; color: #16a34a;">${rem.toLocaleString()}</td>
-                        <td style="padding: 6px 8px; text-align: center;">${pct}%</td>
-                    </tr>
-                `;
-            });
-
-            let expRows = '';
-            (APP_STATE.expenses || []).forEach(exp => {
-                let methodFormatted = exp.method;
-                if (exp.method === 'تحويل بنكي' && exp.beneficiary) methodFormatted += ` (${exp.beneficiary})`;
-                if (exp.bank) methodFormatted += ` [${exp.bank}]`;
-
-                expRows += `
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 5px 8px;">${(exp.date || '').replace('T', ' ')}</td>
-                        <td style="padding: 5px 8px; font-weight: 600;">${exp.store}</td>
-                        <td style="padding: 5px 8px;">${exp.category}</td>
-                        <td style="padding: 5px 8px;">${methodFormatted}</td>
-                        <td style="padding: 5px 8px; font-weight: bold; color: #dc2626; text-align: left;">-${parseFloat(exp.amount).toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-
-            const reportDiv = document.createElement('div');
-            reportDiv.id = 'temp-pdf-report-element';
-            reportDiv.dir = 'rtl';
-            reportDiv.style.cssText = 'position: absolute; left: -9999px; top: -9999px; width: 750px; background: #ffffff; color: #0f172a; padding: 25px; font-family: sans-serif;';
-            reportDiv.innerHTML = `
-                <div style="border-bottom: 2px solid #2563eb; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <h2 style="margin: 0; color: #2563eb; font-size: 20px;">الميزانية الذكية - كشف حساب فوري</h2>
-                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">فترة التقرير: ${periodStr} | توقيت: ${nowStr}</div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
-                    <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; text-align: center;">
-                        <div style="font-size: 12px; color: #64748b;">المقرر</div>
-                        <div style="font-size: 17px; font-weight: bold;">${APP_STATE.monthlyBudget.toLocaleString()} ${APP_STATE.currency}</div>
-                    </div>
-                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 10px; text-align: center;">
-                        <div style="font-size: 12px; color: #991b1b;">المنصرف (${spentPercent}%)</div>
-                        <div style="font-size: 17px; font-weight: bold; color: #dc2626;">${monthlySpent.toLocaleString()} ${APP_STATE.currency}</div>
-                    </div>
-                    <div style="background: ${monthlyDiff >= 0 ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${monthlyDiff >= 0 ? '#bbf7d0' : '#fecaca'}; border-radius: 6px; padding: 10px; text-align: center;">
-                        <div style="font-size: 12px; color: ${monthlyDiff >= 0 ? '#166534' : '#991b1b'};">${monthlyDiff >= 0 ? 'المتبقي' : 'العجز'}</div>
-                        <div style="font-size: 17px; font-weight: bold; color: ${monthlyDiff >= 0 ? '#16a34a' : '#dc2626'};">${monthlyDiff >= 0 ? monthlyDiff.toLocaleString() : ('- ' + Math.abs(monthlyDiff).toLocaleString())} ${APP_STATE.currency}</div>
-                    </div>
-                </div>
-
-                <h4 style="margin-bottom: 6px;">ملخص البنود</h4>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px;">
-                    <thead><tr style="background: #f1f5f9;"><th style="padding:6px;">البند</th><th>المخصص</th><th>المنصرف</th><th>المتبقي</th><th>النسبة</th></tr></thead>
-                    <tbody>${catRows}</tbody>
-                </table>
-
-                <h4 style="margin-bottom: 6px;">سجل العمليات</h4>
-                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                    <thead><tr style="background: #f1f5f9;"><th style="padding:5px;">التاريخ</th><th>المحل</th><th>البند</th><th>الدفع</th><th>المبلغ</th></tr></thead>
-                    <tbody>${expRows || '<tr><td colspan="5" style="text-align:center; padding:10px;">لا توجد عمليات</td></tr>'}</tbody>
-                </table>
-            `;
-            return reportDiv;
-        }
-
-        function exportPDFReport() {
-            const reportElem = buildFinancialReportContainer();
-            document.body.appendChild(reportElem);
-            const opt = {
-                margin: 10,
-                filename: `كشف-حساب-الميزانية-${new Date().toISOString().split('T')[0]}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            if (typeof html2pdf !== 'undefined') {
-                html2pdf().set(opt).from(reportElem).save().then(() => {
-                    reportElem.remove();
-                    showToast('تم تحميل PDF بنجاح!', 'success');
-                }).catch(err => {
-                    reportElem.remove();
-                    showToast('حدث خطأ في إنشاء PDF', 'danger');
-                });
-            } else {
-                printFinancialStatement();
-                reportElem.remove();
-            }
-        }
-
-        function printFinancialStatement() {
-            const reportElem = buildFinancialReportContainer();
-            const printWin = window.open('', '_blank', 'width=800,height=850');
-            printWin.document.write(`
-                <html dir="rtl">
-                <head><title>كشف حساب الميزانية</title></head>
-                <body style="background:#fff;padding:15px;">${reportElem.innerHTML}</body>
-                </html>
-            `);
-            printWin.document.close();
-            printWin.focus();
-            setTimeout(() => { printWin.print(); printWin.close(); }, 500);
-        }
-
-        function exportCSVReport() {
-            if (!APP_STATE.expenses || APP_STATE.expenses.length === 0) {
-                showToast('لا توجد عمليات مسجلة!', 'warning');
-                return;
-            }
-            let csv = 'رقم المعرف,المحل / الوصف,المبلغ (ريال),طريقة الدفع,البنك,المستفيد,البند,التاريخ والوقت\n';
-            APP_STATE.expenses.forEach(e => {
-                csv += `"${e.id}","${(e.store || '').replace(/"/g, '""')}","${e.amount}","${(e.method || '').replace(/"/g, '""')}","${(e.bank || '').replace(/"/g, '""')}","${(e.beneficiary || '').replace(/"/g, '""')}","${(e.category || '').replace(/"/g, '""')}","${(e.date || '').replace('T', ' ')}"\n`;
-            });
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            triggerFileDownload(blob, `سجل-المصروفات-${new Date().toISOString().split('T')[0]}.csv`);
-            showToast('تم تحميل CSV بنجاح!', 'success');
-        }
-
-        async function exportZipArchive() {
-            if (typeof JSZip === 'undefined') {
-                showToast('جاري تهيئة الأرشيف...', 'warning');
-                return;
-            }
-            showToast('جاري تجميع الملفات والفواتير...', 'info');
-            try {
-                const zip = new JSZip();
-                zip.file("budget-data.json", JSON.stringify(APP_STATE, null, 2));
-
-                let csv = 'رقم المعرف,المحل / الوصف,المبلغ,طريقة الدفع,البند,التاريخ\n';
-                (APP_STATE.expenses || []).forEach(e => {
-                    csv += `"${e.id}","${(e.store || '').replace(/"/g, '""')}","${e.amount}","${e.method}","${e.category}","${(e.date || '').replace('T', ' ')}"\n`;
-                });
-                zip.file("expenses.csv", "\uFEFF" + csv);
-
-                const imgFolder = zip.folder("receipts");
-                let imgCount = 0;
-                (APP_STATE.expenses || []).forEach((e, idx) => {
-                    if (e.receiptImg && typeof e.receiptImg === 'string' && e.receiptImg.includes('base64,')) {
-                        const parts = e.receiptImg.split('base64,');
-                        const ext = e.receiptImg.includes('image/jpeg') ? 'jpg' : 'png';
-                        imgFolder.file(`receipt-${idx + 1}-${(e.store || 'item').replace(/[\/\\?%*:|"<>]/g, '_')}.${ext}`, parts[1], { base64: true });
-                        imgCount++;
-                    }
-                });
-
-                const content = await zip.generateAsync({ type: "blob" });
-                triggerFileDownload(content, `الأرشيف-المالي-${new Date().toISOString().split('T')[0]}.zip`);
-                showToast(`تم تحميل الأرشيف (${imgCount} فاتورة)!`, 'success');
-            } catch (err) {
-                showToast('حدث خطأ أثناء الضغط', 'danger');
-            }
-        }
-
-        function loadLocalData() {
-            try {
-                const saved = localStorage.getItem('budget_smart_app_data_v1');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    Object.assign(APP_STATE, parsed);
-                }
-            } catch(e) {}
-        }
-
-        function saveLocalDataFile() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(APP_STATE, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `نسخة-الميزانية-${new Date().toISOString().split('T')[0]}.json`);
-            dlAnchor.click();
-            showToast('تم تصدير النسخة الاحتياطية!', 'success');
-        }
-
-        function importLocalDataFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    Object.assign(APP_STATE, data);
-                    renderDashboard();
-                    renderCategories();
-                    renderRecentExpenses();
-                    renderSavingsPage();
-                    renderDebtsPage();
-                    showToast('تم استعادة النسخة بنجاح!', 'success');
-                } catch(err) {
-                    showToast('ملف غير صالح', 'danger');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-    </script>
-</body>
-</html>
+                    raw = raw.replace(/```json/g, '').replace(/
